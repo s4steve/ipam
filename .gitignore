@@ -10,3 +10,4 @@ venv/
 dist/
 build/
 *.db
+CLAUDE.md
