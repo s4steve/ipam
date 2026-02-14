@@ -1,6 +1,6 @@
 import ipaddress
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
@@ -11,6 +11,7 @@ router = APIRouter(prefix="/subnets", tags=["subnets"])
 
 
 class SubnetCreate(BaseModel):
+    name: str
     cidr: str
     description: str | None = None
 
@@ -29,6 +30,7 @@ class SubnetCreate(BaseModel):
 
 class SubnetResponse(BaseModel):
     id: int
+    name: str
     cidr: str
     netmask: str
     broadcast: str
@@ -45,6 +47,7 @@ class SubnetResponse(BaseModel):
 def _subnet_to_response(subnet: Subnet) -> SubnetResponse:
     return SubnetResponse(
         id=subnet.id,
+        name=subnet.name,
         cidr=subnet.network_str,
         netmask=subnet.netmask,
         broadcast=subnet.broadcast_address,
@@ -55,6 +58,33 @@ def _subnet_to_response(subnet: Subnet) -> SubnetResponse:
         is_ipv6=subnet.is_ipv6,
         description=subnet.description,
     )
+
+
+@router.get("/", response_model=SubnetResponse)
+async def get_subnet(
+    cidr: str | None = Query(None, description="Subnet in CIDR notation, e.g. 192.168.1.0/24"),
+    name: str | None = Query(None, description="Subnet name, e.g. Branch Office"),
+    db: Session = Depends(get_db),
+):
+    if not cidr and not name:
+        raise HTTPException(status_code=400, detail="Provide either 'cidr' or 'name' query parameter")
+
+    if cidr:
+        try:
+            network = ipaddress.ip_network(cidr, strict=False)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid CIDR notation")
+        subnet = db.query(Subnet).filter(
+            Subnet.network_address == _int_to_hex(int(network.network_address)),
+            Subnet.prefix_length == network.prefixlen,
+        ).first()
+    else:
+        subnet = db.query(Subnet).filter(Subnet.name == name).first()
+
+    if not subnet:
+        raise HTTPException(status_code=404, detail="Subnet not found")
+
+    return _subnet_to_response(subnet)
 
 
 @router.post("/", response_model=SubnetResponse, status_code=201)
@@ -68,7 +98,7 @@ async def create_subnet(body: SubnetCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=409, detail=f"Subnet {body.cidr} already exists")
 
-    subnet = Subnet.from_cidr(body.cidr, body.description)
+    subnet = Subnet.from_cidr(body.cidr, body.name, body.description)
     db.add(subnet)
     db.commit()
     db.refresh(subnet)

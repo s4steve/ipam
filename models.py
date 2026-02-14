@@ -24,6 +24,7 @@ class Subnet(Base):
     __tablename__ = "subnets"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
     network_address: Mapped[str] = mapped_column(String(32), nullable=False)
     prefix_length: Mapped[int] = mapped_column(Integer, nullable=False)
     is_ipv6: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -78,9 +79,10 @@ class Subnet(Base):
         return ipaddress.ip_address(address) in self.network
 
     @classmethod
-    def from_cidr(cls, cidr: str, description: str | None = None) -> "Subnet":
+    def from_cidr(cls, cidr: str, name: str, description: str | None = None) -> "Subnet":
         network = ipaddress.ip_network(cidr, strict=False)
         return cls(
+            name=name,
             network_address=_int_to_hex(int(network.network_address)),
             prefix_length=network.prefixlen,
             is_ipv6=isinstance(network, ipaddress.IPv6Network),
