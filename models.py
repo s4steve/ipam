@@ -96,6 +96,7 @@ class IPAddress(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     address: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
     is_ipv6: Mapped[bool] = mapped_column(Boolean, default=False)
+    dns_name: Mapped[str | None] = mapped_column(String(253), nullable=True)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     subnet_id: Mapped[int] = mapped_column(ForeignKey("subnets.id"), nullable=False)
 
@@ -118,7 +119,13 @@ class IPAddress(Base):
         return str(ipaddress.IPv4Address(new_int))
 
     @classmethod
-    def from_string(cls, address: str, subnet: "Subnet", description: str | None = None) -> "IPAddress":
+    def from_string(
+        cls,
+        address: str,
+        subnet: "Subnet",
+        description: str | None = None,
+        dns_name: str | None = None,
+    ) -> "IPAddress":
         addr = ipaddress.ip_address(address)
         if addr not in subnet.network:
             raise ValueError(
@@ -127,6 +134,7 @@ class IPAddress(Base):
         return cls(
             address=_int_to_hex(int(addr)),
             is_ipv6=isinstance(addr, ipaddress.IPv6Address),
+            dns_name=dns_name,
             description=description,
             subnet_id=subnet.id,
         )
