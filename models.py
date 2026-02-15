@@ -90,6 +90,23 @@ class Subnet(Base):
         )
 
 
+class DNSZone(Base):
+    __tablename__ = "dns_zones"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(253), nullable=False, unique=True)
+    description: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # SOA record fields
+    soa_mname: Mapped[str] = mapped_column(String(253), nullable=False)
+    soa_rname: Mapped[str] = mapped_column(String(253), nullable=False)
+    soa_serial: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    soa_refresh: Mapped[int] = mapped_column(Integer, nullable=False, default=3600)
+    soa_retry: Mapped[int] = mapped_column(Integer, nullable=False, default=600)
+    soa_expire: Mapped[int] = mapped_column(Integer, nullable=False, default=604800)
+    soa_minimum: Mapped[int] = mapped_column(Integer, nullable=False, default=86400)
+
+
 class IPAddress(Base):
     __tablename__ = "ip_addresses"
 
