@@ -1,16 +1,18 @@
 # IPAM - IP Address Management
 
-A FastAPI-based IP Address Management system for tracking subnets and IP addresses with full IPv4 and IPv6 support.
+A FastAPI-based IP Address Management system for tracking subnets and IP addresses with full IPv4 and IPv6 support. Includes an MCP server so Claude Desktop (or any MCP client) can manage your IPAM directly through natural language.
 
 ## Features
 
 - Create and look up subnets by CIDR notation or friendly name
 - Full CRUD for IP addresses with parent subnet validation
+- Automatic allocation of the next free IP address in a subnet
 - Full CRUD for DNS zones with SOA record management
 - Optional DNS name association with RFC 1123 validation, enforced to belong to an existing DNS zone
 - Automatic calculation of netmask, broadcast address, usable host range, and host counts
 - Full IPv4 and IPv6 support
 - SQLite storage with hex-encoded addresses for correct sorting across address families
+- MCP server for LLM/Claude Desktop integration
 
 ## Requirements
 
@@ -25,7 +27,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Running
+## Running the API
 
 ```bash
 uvicorn main:app --reload
@@ -35,21 +37,23 @@ The API is available at http://localhost:8000. Interactive docs are at http://lo
 
 ## API Endpoints
 
-| Method | Path                       | Description                                     |
-|--------|----------------------------|-------------------------------------------------|
-| GET    | `/health`                  | Health check                                    |
-| GET    | `/subnets/`                | Look up a subnet by `cidr` or `name`            |
-| POST   | `/subnets/`                | Create a new subnet                             |
-| GET    | `/ip-addresses/`           | List IP addresses (optional `subnet_id` filter) |
-| GET    | `/ip-addresses/{id}`       | Get a single IP address                         |
-| POST   | `/ip-addresses/`           | Create an IP address                            |
-| PUT    | `/ip-addresses/{id}`       | Update an IP address                            |
-| DELETE | `/ip-addresses/{id}`       | Delete an IP address                            |
-| GET    | `/dns-zones/`              | List all DNS zones                              |
-| GET    | `/dns-zones/{id}`          | Get a single DNS zone                           |
-| POST   | `/dns-zones/`              | Create a DNS zone                               |
-| PUT    | `/dns-zones/{id}`          | Update a DNS zone                               |
-| DELETE | `/dns-zones/{id}`          | Delete a DNS zone                               |
+| Method | Path                          | Description                                          |
+|--------|-------------------------------|------------------------------------------------------|
+| GET    | `/health`                     | Health check                                         |
+| GET    | `/subnets/`                   | List/filter subnets (`cidr`, `name`, `contains`)     |
+| POST   | `/subnets/`                   | Create a new subnet                                  |
+| GET    | `/subnets/{id}`               | Get a single subnet                                  |
+| POST   | `/subnets/{id}/allocate`      | Allocate the next free IP address in a subnet        |
+| GET    | `/ip-addresses/`              | List IP addresses (`subnet_id`, `address`, `dns_name`) |
+| GET    | `/ip-addresses/{id}`          | Get a single IP address                              |
+| POST   | `/ip-addresses/`              | Create an IP address                                 |
+| PUT    | `/ip-addresses/{id}`          | Update an IP address                                 |
+| DELETE | `/ip-addresses/{id}`          | Delete an IP address                                 |
+| GET    | `/dns-zones/`                 | List all DNS zones                                   |
+| GET    | `/dns-zones/{id}`             | Get a single DNS zone                                |
+| POST   | `/dns-zones/`                 | Create a DNS zone                                    |
+| PUT    | `/dns-zones/{id}`             | Update a DNS zone                                    |
+| DELETE | `/dns-zones/{id}`             | Delete a DNS zone                                    |
 
 ### DNS zone validation
 
@@ -68,6 +72,14 @@ curl -X POST http://localhost:8000/subnets/ \
 ```bash
 curl "http://localhost:8000/subnets/?name=Branch%20Office"
 curl "http://localhost:8000/subnets/?cidr=192.168.1.0/24"
+```
+
+### Example: Allocate the next free IP address
+
+```bash
+curl -X POST http://localhost:8000/subnets/1/allocate \
+  -H "Content-Type: application/json" \
+  -d '{"dns_name": "host1.example.com", "description": "First host"}'
 ```
 
 ### Example: Create an IP address
@@ -90,4 +102,55 @@ curl -X PUT http://localhost:8000/ip-addresses/1 \
 
 ```bash
 curl "http://localhost:8000/ip-addresses/?subnet_id=1"
+```
+
+## MCP Server
+
+`mcp_server.py` exposes all 14 API actions as MCP tools so Claude Desktop or any MCP client can manage your IPAM through natural language.
+
+### Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_subnets` | List/filter subnets |
+| `get_subnet` | Get a subnet by ID |
+| `create_subnet` | Create a new subnet |
+| `allocate_next_ip` | Allocate the next free IP in a subnet |
+| `list_ip_addresses` | List/filter IP addresses |
+| `get_ip_address` | Get an IP address by ID |
+| `create_ip_address` | Register a specific IP address |
+| `update_ip_address` | Update DNS name or description |
+| `delete_ip_address` | Delete an IP address record |
+| `list_dns_zones` | List/filter DNS zones |
+| `get_dns_zone` | Get a DNS zone by ID |
+| `create_dns_zone` | Create a zone with SOA record |
+| `update_dns_zone` | Update zone name, description, or SOA fields |
+| `delete_dns_zone` | Delete a DNS zone |
+
+### Claude Desktop configuration
+
+Add the following to `~/.config/Claude/claude_desktop_config.json` (Linux) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
+
+```json
+{
+  "mcpServers": {
+    "ipam": {
+      "command": "/path/to/IPAM/.venv/bin/python",
+      "args": ["/path/to/IPAM/mcp_server.py"],
+      "env": {
+        "IPAM_BASE_URL": "http://localhost:8000"
+      }
+    }
+  }
+}
+```
+
+### Testing with MCP Inspector
+
+```bash
+# Terminal 1 — IPAM API must be running first
+uvicorn main:app --reload
+
+# Terminal 2 — opens browser UI at http://localhost:5173
+python -m mcp dev mcp_server.py
 ```
