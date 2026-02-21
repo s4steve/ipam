@@ -6,9 +6,23 @@ from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import IPAddress, Subnet, _int_to_hex
+from models import DNSZone, IPAddress, Subnet, _int_to_hex
 
 router = APIRouter(prefix="/ip-addresses", tags=["ip-addresses"])
+
+
+def _assert_dns_name_in_zone(dns_name: str, db: Session) -> None:
+    """Raise 400 if dns_name is not contained within any existing DNS zone."""
+    normalized = dns_name.rstrip(".")
+    zones = db.query(DNSZone.name).all()
+    for (zone_name,) in zones:
+        zone = zone_name.rstrip(".")
+        if normalized == zone or normalized.endswith("." + zone):
+            return
+    raise HTTPException(
+        status_code=400,
+        detail=f"DNS name '{dns_name}' does not belong to any existing DNS zone",
+    )
 
 _DNS_LABEL_RE = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$")
 
@@ -116,6 +130,9 @@ async def create_ip_address(body: IPAddressCreate, db: Session = Depends(get_db)
     if not subnet:
         raise HTTPException(status_code=404, detail="Parent subnet not found")
 
+    if body.dns_name is not None:
+        _assert_dns_name_in_zone(body.dns_name, db)
+
     addr = ipaddress.ip_address(body.address)
     hex_addr = _int_to_hex(int(addr))
 
@@ -143,6 +160,9 @@ async def update_ip_address(
     ip = db.query(IPAddress).filter(IPAddress.id == ip_address_id).first()
     if not ip:
         raise HTTPException(status_code=404, detail="IP address not found")
+
+    if body.dns_name is not None:
+        _assert_dns_name_in_zone(body.dns_name, db)
 
     ip.dns_name = body.dns_name
     ip.description = body.description

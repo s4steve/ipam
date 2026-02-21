@@ -6,7 +6,8 @@ A FastAPI-based IP Address Management system for tracking subnets and IP address
 
 - Create and look up subnets by CIDR notation or friendly name
 - Full CRUD for IP addresses with parent subnet validation
-- Optional DNS name association with RFC 1123 validation
+- Full CRUD for DNS zones with SOA record management
+- Optional DNS name association with RFC 1123 validation, enforced to belong to an existing DNS zone
 - Automatic calculation of netmask, broadcast address, usable host range, and host counts
 - Full IPv4 and IPv6 support
 - SQLite storage with hex-encoded addresses for correct sorting across address families
@@ -34,16 +35,25 @@ The API is available at http://localhost:8000. Interactive docs are at http://lo
 
 ## API Endpoints
 
-| Method | Path                       | Description                                |
-|--------|----------------------------|--------------------------------------------|
-| GET    | `/health`                  | Health check                               |
-| GET    | `/subnets/`                | Look up a subnet by `cidr` or `name`       |
-| POST   | `/subnets/`                | Create a new subnet                        |
+| Method | Path                       | Description                                     |
+|--------|----------------------------|-------------------------------------------------|
+| GET    | `/health`                  | Health check                                    |
+| GET    | `/subnets/`                | Look up a subnet by `cidr` or `name`            |
+| POST   | `/subnets/`                | Create a new subnet                             |
 | GET    | `/ip-addresses/`           | List IP addresses (optional `subnet_id` filter) |
-| GET    | `/ip-addresses/{id}`       | Get a single IP address                    |
-| POST   | `/ip-addresses/`           | Create an IP address                       |
-| PUT    | `/ip-addresses/{id}`       | Update an IP address                       |
-| DELETE | `/ip-addresses/{id}`       | Delete an IP address                       |
+| GET    | `/ip-addresses/{id}`       | Get a single IP address                         |
+| POST   | `/ip-addresses/`           | Create an IP address                            |
+| PUT    | `/ip-addresses/{id}`       | Update an IP address                            |
+| DELETE | `/ip-addresses/{id}`       | Delete an IP address                            |
+| GET    | `/dns-zones/`              | List all DNS zones                              |
+| GET    | `/dns-zones/{id}`          | Get a single DNS zone                           |
+| POST   | `/dns-zones/`              | Create a DNS zone                               |
+| PUT    | `/dns-zones/{id}`          | Update a DNS zone                               |
+| DELETE | `/dns-zones/{id}`          | Delete a DNS zone                               |
+
+### DNS zone validation
+
+When creating or updating an IP address, any `dns_name` provided must be contained within an existing DNS zone. For example, if zone `example.com` exists, `host.example.com` and `sub.host.example.com` are accepted; `host.other.com` is rejected with `HTTP 400`.
 
 ### Example: Create a subnet
 
