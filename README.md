@@ -36,7 +36,7 @@ All API endpoints except `/health` require a Bearer token. The token is set via 
 Use the included `API-gen.sh` script to generate a cryptographically random 64-character hex key:
 
 ```bash
-bash API-gen.sh
+./API-gen.sh
 ```
 
 The script prints a key to stdout. Copy it into your `.env` file.

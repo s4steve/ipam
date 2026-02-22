@@ -1,2 +1,2 @@
-!#/bin/bash
+#!/bin/bash
 openssl rand -hex 32
