@@ -35,6 +35,34 @@ uvicorn main:app --reload
 
 The API is available at http://localhost:8000. Interactive docs are at http://localhost:8000/docs.
 
+## Docker
+
+### Build the image
+
+```bash
+docker build -t ipam .
+```
+
+### Run with a named volume (recommended)
+
+The SQLite database is stored in `/app/data` inside the container. Mount a volume there so data persists across container restarts:
+
+```bash
+docker run -p 8000:8000 -v ipam-data:/app/data ipam
+```
+
+### Run with a bind mount
+
+```bash
+docker run -p 8000:8000 -v ./data:/app/data ipam
+```
+
+### Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `sqlite:///./ipam.db` | SQLAlchemy database URL. Set automatically to `/app/data/ipam.db` in the Docker image. |
+
 ## API Endpoints
 
 | Method | Path                          | Description                                          |
