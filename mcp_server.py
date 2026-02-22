@@ -17,11 +17,13 @@ import httpx
 from mcp.server.fastmcp import FastMCP
 
 BASE_URL = os.environ.get("IPAM_BASE_URL", "http://localhost:8000").rstrip("/")
+_API_KEY = os.environ.get("IPAM_API_KEY", "")
 
 
 @asynccontextmanager
 async def lifespan(server):
-    async with httpx.AsyncClient(base_url=BASE_URL, timeout=30.0) as client:
+    headers = {"Authorization": f"Bearer {_API_KEY}"} if _API_KEY else {}
+    async with httpx.AsyncClient(base_url=BASE_URL, timeout=30.0, headers=headers) as client:
         yield {"client": client}
 
 
