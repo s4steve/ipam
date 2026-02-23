@@ -50,6 +50,11 @@ class SubnetResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class SubnetUpdate(BaseModel):
+    name: str | None = Field(None, description="New human-readable name for the subnet")
+    description: str | None = Field(None, description="Updated description; pass null to clear")
+
+
 class AllocateRequest(BaseModel):
     dns_name: str | None = Field(
         None,
@@ -187,6 +192,55 @@ async def create_subnet(body: SubnetCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(subnet)
     return _subnet_to_response(subnet, 0)
+
+
+@router.put(
+    "/{subnet_id}",
+    response_model=SubnetResponse,
+    summary="Update a subnet",
+    description="Partially update a subnet. Only provided fields are changed. The CIDR cannot be changed.",
+)
+async def update_subnet(
+    subnet_id: int,
+    body: SubnetUpdate,
+    db: Session = Depends(get_db),
+):
+    subnet = db.query(Subnet).filter(Subnet.id == subnet_id).first()
+    if not subnet:
+        raise HTTPException(status_code=404, detail="Subnet not found")
+
+    if body.name is not None:
+        subnet.name = body.name
+
+    if body.description is not None:
+        subnet.description = body.description
+
+    db.commit()
+    db.refresh(subnet)
+    counts = _get_allocated_counts([subnet.id], db)
+    return _subnet_to_response(subnet, counts.get(subnet.id, 0))
+
+
+@router.delete(
+    "/{subnet_id}",
+    status_code=204,
+    summary="Delete a subnet",
+    description="Delete a subnet. The subnet must contain no allocated IP addresses.",
+)
+async def delete_subnet(subnet_id: int, db: Session = Depends(get_db)):
+    subnet = db.query(Subnet).filter(Subnet.id == subnet_id).first()
+    if not subnet:
+        raise HTTPException(status_code=404, detail="Subnet not found")
+
+    allocated = db.query(IPAddress).filter(IPAddress.subnet_id == subnet_id).count()
+    if allocated > 0:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Subnet cannot be deleted: it contains {allocated} allocated IP address{'es' if allocated != 1 else ''}",
+        )
+
+    db.delete(subnet)
+    db.commit()
 
 
 @router.post(

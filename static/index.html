@@ -6,407 +6,303 @@
 <title>IPAM // Control</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Fragment+Mono&family=Overpass:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-void:    #030810;
-  --bg-base:    #060e1e;
-  --bg-surface: #0b1628;
-  --bg-raised:  #122034;
-  --bg-hover:   #192a40;
-  --border-dim: #121f33;
-  --border:     #1c2e48;
-  --border-hi:  #2a4468;
-  --text:       #dce9f6;
-  --text-2:     #7a92ac;
-  --text-3:     #3a536a;
-  --accent:     #1d6cf5;
-  --accent-lo:  rgba(29,108,245,0.15);
-  --accent-glow:rgba(29,108,245,0.35);
-  --cyan:       #07b6d5;
-  --cyan-lo:    rgba(7,182,213,0.15);
-  --cyan-glow:  rgba(7,182,213,0.3);
-  --green:      #0ea872;
-  --green-bright:#22d48f;
-  --amber:      #e09220;
-  --red:        #e03b3b;
-  --red-lo:     rgba(224,59,59,0.12);
-  --font-ui:   'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --r:          8px;
+  --bg-void:    #040810;
+  --bg-base:    #070d1a;
+  --bg-surface: #0b1320;
+  --bg-raised:  #101c2c;
+  --bg-hover:   #162334;
+  --border-dim: #0d1928;
+  --border:     #162238;
+  --border-hi:  #214060;
+  --text:       #c8dff2;
+  --text-2:     #527898;
+  --text-3:     #274060;
+  --accent:     #f56420;
+  --accent-lo:  rgba(245,100,32,.10);
+  --accent-glow:rgba(245,100,32,.28);
+  --cyan:       #00d8ff;
+  --cyan-lo:    rgba(0,216,255,.10);
+  --cyan-glow:  rgba(0,216,255,.22);
+  --green:      #00c878;
+  --green-hi:   #00ff9a;
+  --amber:      #ffaa00;
+  --red:        #ff3f4a;
+  --red-lo:     rgba(255,63,74,.10);
+  --font-ui:    'Oxanium', sans-serif;
+  --font-body:  'Overpass', sans-serif;
+  --font-mono:  'Fragment Mono', monospace;
+  --r: 6px;
 }
 
 html, body { height: 100%; background: var(--bg-void); color: var(--text); font-family: var(--font-body); font-size: 14px; line-height: 1.5; overflow-x: hidden; }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg-surface); }
-::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
 
-/* Dot-grid background texture */
 body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: radial-gradient(circle, rgba(29,108,245,0.07) 1px, transparent 0);
-  background-size: 28px 28px;
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(245,100,32,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,100,32,.04) 1px, transparent 1px);
+  background-size: 44px 44px; background-position: -1px -1px;
   pointer-events: none; z-index: 0;
 }
 
-/* ── TOPBAR ─────────────────────────────────────────── */
+/* ── TOPBAR ── */
 .topbar {
   position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; height: 54px;
-  background: rgba(6,14,30,0.88);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  overflow: hidden;
+  display: flex; align-items: center; height: 52px;
+  background: rgba(7,13,26,.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); padding: 0 20px; overflow: hidden;
 }
 .topbar::after {
-  content: '';
-  position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--accent) 40%, var(--cyan) 60%, transparent 100%);
-  opacity: 0.4;
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 35%, var(--cyan) 65%, transparent 100%);
+  opacity: .5;
 }
-.topbar::before {
-  content: '';
-  position: absolute; left: 0; right: 0; height: 54px;
-  background: linear-gradient(to bottom, transparent, rgba(29,108,245,0.035), transparent);
-  animation: bar-scan 5s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes bar-scan {
-  0%,100% { transform: translateY(-54px); opacity: 0; }
-  10%,90%  { opacity: 1; }
-  50%      { transform: translateY(54px); }
-}
-
 .logo {
-  display: flex; align-items: center; gap: 10px;
-  font-family: var(--font-ui); font-weight: 800; font-size: 16px;
-  color: var(--text); text-decoration: none; margin-right: 28px; white-space: nowrap;
-  cursor: pointer;
+  display: flex; align-items: center; gap: 9px;
+  font-family: var(--font-ui); font-size: 14px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--text); cursor: pointer; margin-right: 24px;
+  white-space: nowrap; user-select: none; text-decoration: none;
 }
 .logo-mark {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; background: var(--accent);
-  border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: .05em;
-  color: #fff; box-shadow: 0 0 14px var(--accent-glow);
+  width: 26px; height: 26px; background: var(--accent); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; letter-spacing: .04em; color: #fff;
+  box-shadow: 0 0 12px var(--accent-glow); flex-shrink: 0;
 }
-.logo-slash { color: var(--text-3); margin: 0 2px; }
-
-.topbar-nav { display: flex; gap: 2px; flex: 1; }
+.topbar-nav { display: flex; gap: 1px; flex: 1; }
 .nav-btn {
-  padding: 5px 13px; border-radius: 6px;
-  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
-  color: var(--text-2); cursor: pointer;
-  border: none; background: none;
-  letter-spacing: .03em; transition: color .15s, background .15s;
+  padding: 5px 12px; border-radius: 5px;
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--text-2); background: none; border: none;
+  cursor: pointer; transition: color .15s, background .15s;
 }
 .nav-btn:hover { color: var(--text); background: var(--bg-raised); }
-.nav-btn.active {
-  color: var(--text); background: var(--accent-lo);
-  box-shadow: inset 0 0 0 1px rgba(29,108,245,.28);
-}
-
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-
+.nav-btn.active { color: var(--accent); background: var(--accent-lo); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
 .health-pill {
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--font-mono); font-size: 11px; color: var(--text-2);
-  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-2);
+  padding: 4px 9px; border-radius: 20px; border: 1px solid var(--border);
   cursor: pointer; transition: border-color .15s;
 }
 .health-pill:hover { border-color: var(--border-hi); }
-.health-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--text-3); transition: background .3s;
-}
-.health-dot.ok  { background: var(--green-bright); box-shadow: 0 0 6px var(--green-bright); animation: pulse-g 2.5s ease-in-out infinite; }
-.health-dot.err { background: var(--red); box-shadow: 0 0 6px var(--red); }
-@keyframes pulse-g { 0%,100%{opacity:1}50%{opacity:.4} }
-
+.hdot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); transition: background .3s; }
+.hdot.ok  { background: var(--green-hi); box-shadow: 0 0 5px var(--green-hi); animation: pulse 2.5s ease-in-out infinite; }
+.hdot.err { background: var(--red); box-shadow: 0 0 5px var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 .key-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 12px; border-radius: 6px;
+  display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px;
   border: 1px solid var(--border); background: var(--bg-surface);
-  color: var(--text-2); font-family: var(--font-body); font-size: 12px;
+  color: var(--text-2); font-family: var(--font-body); font-size: 11px;
   cursor: pointer; transition: all .15s;
 }
 .key-btn:hover { border-color: var(--border-hi); color: var(--text); }
-.key-btn.has-key { border-color: rgba(29,108,245,.35); color: #6aa3fa; }
+.key-btn.has-key { border-color: rgba(245,100,32,.4); color: #ff8c50; }
 
-/* ── LAYOUT ─────────────────────────────────────────── */
-.main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 32px 24px 80px; }
+/* ── LAYOUT ── */
+.main { position: relative; z-index: 1; max-width: 1380px; margin: 0 auto; padding: 28px 20px 80px; }
 
-/* ── PAGE HEADER ─────────────────────────────────────── */
-.page-hd {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  margin-bottom: 28px; gap: 16px;
-}
-.page-title { font-family: var(--font-ui); font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
-.page-sub   { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+/* ── PAGE HEADER ── */
+.page-hd { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 14px; }
+.page-title { font-family: var(--font-ui); font-size: 24px; font-weight: 700; letter-spacing: -.01em; line-height: 1.1; }
+.page-sub { font-size: 12px; color: var(--text-2); margin-top: 3px; }
 
-/* ── STAT CARDS ──────────────────────────────────────── */
-.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+/* ── STAT CARDS ── */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
 .stat-card {
   background: var(--bg-surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 20px 22px;
-  position: relative; overflow: hidden; transition: border-color .2s;
+  border-radius: var(--r); padding: 18px 20px; position: relative; overflow: hidden;
+  transition: border-color .2s;
 }
 .stat-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
   opacity: 0; transition: opacity .2s;
 }
 .stat-card:hover { border-color: var(--border-hi); }
 .stat-card:hover::before { opacity: 1; }
-.stat-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); margin-bottom: 6px; }
-.stat-val { font-family: var(--font-ui); font-size: 38px; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-lbl { font-family: var(--font-ui); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-3); margin-bottom: 8px; }
+.stat-val { font-family: var(--font-ui); font-size: 36px; font-weight: 800; color: var(--text); line-height: 1; }
 .stat-sub { font-size: 11px; color: var(--text-2); margin-top: 5px; }
 
-/* ── CARD ────────────────────────────────────────────── */
+/* ── CARD ── */
 .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-.card + .card, .section { margin-top: 20px; }
-.card-hd {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-}
-.card-title { font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: .03em; }
+.card + .card, .section { margin-top: 16px; }
+.card-hd { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.card-title { font-family: var(--font-ui); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--text-2); }
 
-/* ── TABLE ───────────────────────────────────────────── */
+/* ── TABLE ── */
 .dtbl { width: 100%; border-collapse: collapse; }
 .dtbl th {
-  padding: 9px 16px; text-align: left;
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em;
+  padding: 8px 14px; text-align: left;
+  font-family: var(--font-ui); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em;
   color: var(--text-3); border-bottom: 1px solid var(--border); white-space: nowrap;
 }
-.dtbl td { padding: 11px 16px; border-bottom: 1px solid var(--border-dim); vertical-align: middle; }
+.dtbl td { padding: 10px 14px; border-bottom: 1px solid var(--border-dim); vertical-align: middle; }
 .dtbl tbody tr { cursor: pointer; transition: background .1s; position: relative; }
-.dtbl tbody tr::after {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
-  background: var(--accent); opacity: 0; transition: opacity .12s;
-}
-.dtbl tbody tr:hover { background: rgba(25,42,64,.55); }
-.dtbl tbody tr:hover::after { opacity: 1; }
+.dtbl tbody tr::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); opacity: 0; transition: opacity .12s; }
+.dtbl tbody tr:hover { background: rgba(22,35,52,.6); }
+.dtbl tbody tr:hover::before { opacity: 1; }
 .dtbl tbody tr:last-child td { border-bottom: none; }
-
-.mono { font-family: var(--font-mono); font-size: 12px; }
+.mono    { font-family: var(--font-mono); font-size: 12px; }
 .mono-sm { font-family: var(--font-mono); font-size: 11px; color: var(--text-2); }
 
-/* ── BADGES ──────────────────────────────────────────── */
-.badge {
-  display: inline-flex; align-items: center;
-  padding: 2px 7px; border-radius: 4px;
-  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
-}
-.badge-blue { background: var(--accent-lo); color: #7ab3ff; border: 1px solid rgba(29,108,245,.22); }
-.badge-cyan { background: var(--cyan-lo); color: #2de5ff; border: 1px solid rgba(7,182,213,.22); }
-.badge-green{ background: rgba(14,168,114,.12); color: #2cd99a; border: 1px solid rgba(14,168,114,.22); }
-.badge-red  { background: var(--red-lo); color: #f07070; border: 1px solid rgba(224,59,59,.2); }
-.badge-amber{ background: rgba(224,146,32,.1); color: #f0ba60; border: 1px solid rgba(224,146,32,.2); }
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 3px; font-family: var(--font-ui); font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.badge-blue  { background: rgba(0,80,180,.15); color: #5a9fff; border: 1px solid rgba(0,100,220,.2); }
+.badge-cyan  { background: var(--cyan-lo);     color: #40e8ff; border: 1px solid rgba(0,216,255,.2); }
+.badge-green { background: rgba(0,200,120,.1); color: #30e890; border: 1px solid rgba(0,200,120,.2); }
+.badge-red   { background: var(--red-lo);      color: #ff7070; border: 1px solid rgba(255,63,74,.2); }
+.badge-amber { background: rgba(255,170,0,.1); color: #ffcc50; border: 1px solid rgba(255,170,0,.2); }
 
-/* ── UTIL BAR ────────────────────────────────────────── */
-.ubar { height: 3px; background: var(--bg-raised); border-radius: 2px; overflow: hidden; }
-.ubar-fill { height: 100%; border-radius: 2px; transition: width .8s cubic-bezier(.34,1.56,.64,1); }
+/* ── UTIL BAR ── */
+.ubar { background: var(--bg-raised); border-radius: 1px; overflow: hidden; }
+.ubar-fill { height: 100%; border-radius: 1px; transition: width .8s cubic-bezier(.34,1.56,.64,1); }
 
-/* ── BUTTONS ─────────────────────────────────────────── */
-.btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 14px; border-radius: 6px;
-  font-family: var(--font-body); font-size: 13px; font-weight: 500;
-  cursor: pointer; border: 1px solid transparent;
-  transition: all .15s; white-space: nowrap;
-}
+/* ── BUTTONS ── */
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: var(--r); font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all .15s; white-space: nowrap; line-height: 1; }
 .btn-p { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-p:hover { background: #1559d4; }
+.btn-p:hover { background: #d45518; box-shadow: 0 0 10px var(--accent-glow); }
 .btn-s { background: var(--bg-raised); color: var(--text); border-color: var(--border); }
 .btn-s:hover { border-color: var(--border-hi); }
-.btn-g { background: transparent; color: var(--text-2); }
+.btn-g { background: transparent; color: var(--text-2); border: none; }
 .btn-g:hover { background: var(--bg-raised); color: var(--text); }
-.btn-d { background: var(--red-lo); color: #f07070; border-color: rgba(224,59,59,.2); }
-.btn-d:hover { background: rgba(224,59,59,.2); }
-.btn-sm { padding: 4px 10px; font-size: 12px; }
-.btn-icon { width: 28px; height: 28px; padding: 0; justify-content: center; background: var(--bg-raised); border-color: var(--border); color: var(--text-2); border-radius: 6px; }
+.btn-d { background: var(--red-lo); color: #ff7070; border-color: rgba(255,63,74,.22); }
+.btn-d:hover { background: rgba(255,63,74,.18); }
+.btn-sm { padding: 4px 9px; font-size: 12px; }
+.btn-icon { width: 26px; height: 26px; padding: 0; justify-content: center; background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-2); border-radius: 5px; flex-shrink: 0; }
 .btn-icon:hover { color: var(--text); border-color: var(--border-hi); }
-.btn:disabled { opacity: .5; cursor: default; }
+.btn-icon.del:hover { color: #ff7070; border-color: rgba(255,63,74,.4); background: var(--red-lo); }
+.btn:disabled { opacity: .45; cursor: default; pointer-events: none; }
 
-/* ── FORMS ───────────────────────────────────────────── */
-.fg { margin-bottom: 14px; }
-.flbl { display: block; font-size: 11px; font-weight: 500; color: var(--text-2); margin-bottom: 5px; letter-spacing: .03em; }
-.finp {
-  width: 100%; padding: 8px 12px;
-  background: var(--bg-raised); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--text); font-family: var(--font-body); font-size: 13px;
-  transition: border-color .15s; outline: none;
-}
-.finp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+/* ── FORMS ── */
+.fg { margin-bottom: 12px; }
+.flbl { display: block; font-family: var(--font-ui); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--text-2); margin-bottom: 4px; }
+.finp { width: 100%; padding: 8px 10px; background: var(--bg-raised); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-family: var(--font-body); font-size: 13px; transition: border-color .15s, box-shadow .15s; outline: none; }
+.finp:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
 .finp::placeholder { color: var(--text-3); }
 .finp.fm { font-family: var(--font-mono); font-size: 12px; }
-.fhint { font-size: 11px; color: var(--text-3); margin-top: 3px; }
-.ferr  { font-size: 11px; color: #f07070; margin-top: 3px; }
+.fhint { font-size: 10px; color: var(--text-3); margin-top: 3px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-/* ── DRAWER ──────────────────────────────────────────── */
-.overlay {
-  position: fixed; inset: 0; background: rgba(3,8,16,.75);
-  backdrop-filter: blur(3px); z-index: 200;
-  opacity: 0; pointer-events: none; transition: opacity .25s;
-}
+/* ── DRAWER ── */
+.overlay { position: fixed; inset: 0; background: rgba(4,8,16,.72); backdrop-filter: blur(4px); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; }
 .overlay.open { opacity: 1; pointer-events: all; }
-.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; width: 440px;
-  background: var(--bg-surface); border-left: 1px solid var(--border);
-  z-index: 201; transform: translateX(100%);
-  transition: transform .3s cubic-bezier(.16,1,.3,1);
-  display: flex; flex-direction: column; overflow: hidden;
-}
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 420px; background: var(--bg-surface); border-left: 1px solid var(--border); z-index: 201; transform: translateX(100%); transition: transform .3s cubic-bezier(.16,1,.3,1); display: flex; flex-direction: column; overflow: hidden; }
 .drawer.open { transform: translateX(0); }
-.drawer-hd {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 22px; border-bottom: 1px solid var(--border); flex-shrink: 0;
-}
-.drawer-title { font-family: var(--font-ui); font-size: 15px; font-weight: 600; }
-.drawer-body  { flex: 1; overflow-y: auto; padding: 22px; }
-.drawer-foot  { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
+.drawer-hd { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.drawer-title { font-family: var(--font-ui); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+.drawer-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
 
-/* ── CONFIG MODAL ────────────────────────────────────── */
-.cfg-wrap {
-  position: fixed; inset: 0; z-index: 300;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(3,8,16,.82); backdrop-filter: blur(4px);
-  opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-.cfg-wrap.open { opacity: 1; pointer-events: all; }
-.cfg-box {
-  background: var(--bg-surface); border: 1px solid var(--border-hi);
-  border-radius: 12px; width: 400px; padding: 28px;
-  transform: scale(.95); transition: transform .2s;
-}
-.cfg-wrap.open .cfg-box { transform: scale(1); }
-.cfg-title { font-family: var(--font-ui); font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+/* ── MODAL BASE ── */
+.modal-wrap { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; background: rgba(4,8,16,.86); backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-wrap.open { opacity: 1; pointer-events: all; }
+.modal-box { background: var(--bg-surface); border: 1px solid var(--border-hi); border-radius: 10px; padding: 26px; transform: scale(.95); transition: transform .2s; min-width: 340px; }
+.modal-wrap.open .modal-box { transform: scale(1); }
+.modal-title { font-family: var(--font-ui); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 18px; }
 
-/* ── SUBNET CARDS ────────────────────────────────────── */
-.sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+/* ── CONFIRM MODAL ── */
+.confirm-box { max-width: 360px; text-align: center; }
+.confirm-icon { font-size: 28px; margin-bottom: 12px; }
+.confirm-title { font-family: var(--font-ui); font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.confirm-msg { font-size: 13px; color: var(--text-2); margin-bottom: 20px; line-height: 1.6; }
+.confirm-btns { display: flex; gap: 8px; justify-content: center; }
+
+/* ── SUBNET CARDS ── */
+.sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .sc {
   background: var(--bg-surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 18px 20px; cursor: pointer;
-  transition: border-color .2s, background .2s; position: relative; overflow: hidden;
+  border-radius: var(--r); padding: 16px 18px;
+  cursor: pointer; transition: border-color .18s, background .18s;
+  position: relative; overflow: hidden;
 }
-.sc::after {
-  content: ''; position: absolute; inset: 0; border-radius: var(--r);
-  box-shadow: inset 0 0 0 1px var(--accent); opacity: 0; transition: opacity .2s;
-}
+.sc::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); opacity: 0; transition: opacity .18s; }
 .sc:hover { border-color: var(--border-hi); background: var(--bg-raised); }
-.sc:hover::after { opacity: .25; }
-.sc-cidr { font-family: var(--font-mono); font-size: 19px; font-weight: 500; margin-bottom: 3px; }
-.sc-name { font-size: 12px; color: var(--text-2); margin-bottom: 14px; min-height: 16px; }
-.sc-ubar { height: 3px; background: var(--bg-raised); border-radius: 2px; margin-bottom: 7px; overflow: hidden; }
-.sc-fill  { height: 100%; border-radius: 2px; transition: width .9s cubic-bezier(.34,1.56,.64,1); }
-.sc-stats { display: flex; gap: 14px; font-size: 11px; color: var(--text-2); }
-.sc-stats strong { color: var(--text); font-weight: 500; }
+.sc:hover::before { opacity: 1; }
+.sc-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; opacity: 0; transition: opacity .15s; z-index: 2; }
+.sc:hover .sc-actions { opacity: 1; }
+.sc-cidr { font-family: var(--font-mono); font-size: 17px; margin-bottom: 2px; padding-right: 60px; }
+.sc-name { font-size: 11px; color: var(--text-2); margin-bottom: 12px; min-height: 15px; }
+.sc-ubar { height: 2px; background: var(--bg-raised); border-radius: 1px; margin-bottom: 7px; overflow: hidden; }
+.sc-fill { height: 100%; border-radius: 1px; transition: width .9s cubic-bezier(.34,1.56,.64,1); }
+.sc-stats { display: flex; gap: 12px; font-family: var(--font-ui); font-size: 10px; color: var(--text-2); }
+.sc-stats strong { color: var(--text); font-weight: 600; }
+.sc-badges { display: flex; gap: 4px; margin-bottom: 8px; }
 
-/* ── ZONE CARDS ──────────────────────────────────────── */
-.zc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
-.zc {
-  background: var(--bg-surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 18px 20px; transition: border-color .2s;
-}
+/* ── ZONE CARDS ── */
+.zc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.zc { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; transition: border-color .18s; }
 .zc:hover { border-color: var(--border-hi); }
-.zc-name { font-family: var(--font-mono); font-size: 17px; font-weight: 500; margin-bottom: 3px; }
-.zc-desc { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
-.zc-soa  { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; margin-top: 10px; }
-.zc-row  { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); }
+.zc-name { font-family: var(--font-mono); font-size: 15px; margin-bottom: 2px; }
+.zc-desc { font-size: 11px; color: var(--text-2); margin-bottom: 8px; }
+.zc-soa { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; margin-top: 8px; }
+.zc-row { font-family: var(--font-mono); font-size: 9px; color: var(--text-3); }
 .zc-row span { color: var(--text-2); }
-hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 
-/* ── DETAIL LAYOUT ───────────────────────────────────── */
-.detail-lay { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
-@media (max-width: 860px) { .detail-lay { grid-template-columns: 1fr; } }
+/* ── DETAIL LAYOUT ── */
+.detail-lay { display: grid; grid-template-columns: 1fr 280px; gap: 16px; align-items: start; }
+@media (max-width: 820px) { .detail-lay { grid-template-columns: 1fr; } }
 
-/* ── IP GRID ─────────────────────────────────────────── */
-.ipgrid-wrap { padding: 16px; }
-.ipgrid-legend { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
-.ipgrid-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-3); }
-.ipgrid-legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+/* ── IP GRID ── */
+.ipgrid-wrap { padding: 14px; }
+.ipgrid-legend { display: flex; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.ipgrid-legend-item { display: flex; align-items: center; gap: 4px; font-family: var(--font-ui); font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); }
+.ipgrid-legend-swatch { width: 9px; height: 9px; border-radius: 1px; }
 #ip-grid { display: grid; width: fit-content; }
-.ipc {
-  border-radius: 1.5px;
-  cursor: default;
-  transition: transform .08s;
-}
-.ipc:hover { transform: scale(1.6); z-index: 5; position: relative; }
-.ipc.free   { background: var(--bg-raised); }
-.ipc.alloc  { background: var(--cyan); box-shadow: 0 0 3px var(--cyan-glow); }
-.ipc.res    { background: var(--border-hi); }
+.ipc { border-radius: 1px; cursor: default; transition: transform .06s; }
+.ipc:hover { transform: scale(1.7); z-index: 5; position: relative; }
+.ipc.free  { background: var(--bg-raised); }
+.ipc.alloc { background: var(--cyan); box-shadow: 0 0 2px var(--cyan-glow); }
+.ipc.res   { background: var(--border-hi); }
 
-/* ── SUBNET DETAILS TABLE ────────────────────────────── */
+/* ── DETAIL TABLE ── */
 .detail-tbl { width: 100%; border-collapse: collapse; }
-.detail-tbl td { padding: 6px 0; border-bottom: 1px solid var(--border-dim); font-size: 12px; }
-.detail-tbl td:first-child { color: var(--text-3); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; width: 50%; }
-.detail-tbl td:last-child  { font-family: var(--font-mono); font-size: 11px; text-align: right; }
+.detail-tbl td { padding: 5px 0; border-bottom: 1px solid var(--border-dim); }
+.detail-tbl td:first-child { font-family: var(--font-ui); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--text-3); width: 45%; }
+.detail-tbl td:last-child { font-family: var(--font-mono); font-size: 10px; text-align: right; }
 .detail-tbl tr:last-child td { border-bottom: none; }
 
-/* ── LOADING / EMPTY ─────────────────────────────────── */
-.loading, .empty {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 60px 32px; color: var(--text-3); gap: 10px; text-align: center;
-}
-.spinner { width: 22px; height: 22px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
+/* ── LOADING / EMPTY ── */
+.loading, .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 56px 32px; color: var(--text-3); gap: 8px; text-align: center; }
+.spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .55s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.empty-ico  { font-size: 28px; opacity: .25; }
-.empty-txt  { font-size: 14px; color: var(--text-2); }
-.empty-hint { font-size: 12px; }
+.empty-ico  { font-size: 26px; opacity: .2; }
+.empty-txt  { font-size: 13px; color: var(--text-2); }
+.empty-hint { font-size: 11px; }
 
-/* ── TOAST ───────────────────────────────────────────── */
-#toasts { position: fixed; bottom: 22px; right: 22px; z-index: 500; display: flex; flex-direction: column; gap: 7px; }
-.toast {
-  padding: 11px 15px; border-radius: 8px; font-size: 13px;
-  background: var(--bg-raised); border: 1px solid var(--border-hi);
-  color: var(--text); box-shadow: 0 8px 30px rgba(0,0,0,.5);
-  animation: tin .3s cubic-bezier(.34,1.56,.64,1) forwards; max-width: 300px;
-}
-.toast.ok  { border-color: rgba(14,168,114,.4); }
-.toast.err { border-color: rgba(224,59,59,.4); color: #f07070; }
-@keyframes tin { from { opacity:0; transform: translateX(16px) scale(.94); } to { opacity:1; transform: none; } }
+/* ── TOAST ── */
+#toasts { position: fixed; bottom: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 6px; }
+.toast { padding: 10px 14px; border-radius: 7px; font-family: var(--font-ui); font-size: 11px; letter-spacing: .02em; background: var(--bg-raised); border: 1px solid var(--border-hi); color: var(--text); box-shadow: 0 6px 24px rgba(0,0,0,.5); animation: tin .25s cubic-bezier(.34,1.56,.64,1) forwards; max-width: 280px; }
+.toast.ok  { border-color: rgba(0,200,120,.4); color: #40e890; }
+.toast.err { border-color: rgba(255,63,74,.4);  color: #ff7070; }
+@keyframes tin { from { opacity:0; transform: translateX(14px) scale(.93); } to { opacity:1; transform: none; } }
 
-/* ── FILTERS ─────────────────────────────────────────── */
-.filters { display: flex; gap: 9px; margin-bottom: 18px; flex-wrap: wrap; }
-.fi {
-  padding: 6px 12px; background: var(--bg-surface); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--text); font-family: var(--font-mono); font-size: 12px;
-  outline: none; transition: border-color .15s; min-width: 200px;
-}
+/* ── FILTERS ── */
+.filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.fi { padding: 6px 10px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-family: var(--font-mono); font-size: 11px; outline: none; transition: border-color .15s; min-width: 180px; }
 .fi:focus { border-color: var(--accent); }
 .fi::placeholder { color: var(--text-3); font-family: var(--font-body); }
 
-/* ── BACK ────────────────────────────────────────────── */
-.back {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12px; color: var(--text-2); cursor: pointer;
-  padding: 4px 0; margin-bottom: 18px; border: none; background: none;
-  font-family: var(--font-body); transition: color .15s;
-}
-.back:hover { color: var(--text); }
+/* ── BACK ── */
+.back { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-ui); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--text-3); cursor: pointer; padding: 4px 0; margin-bottom: 16px; border: none; background: none; transition: color .15s; }
+.back:hover { color: var(--text-2); }
 
-/* ── INLINE ERR BANNER ───────────────────────────────── */
-.err-banner {
-  padding: 10px 14px; background: rgba(224,59,59,.08);
-  border: 1px solid rgba(224,59,59,.22); border-radius: 6px;
-  color: #f07070; font-size: 13px; margin-bottom: 14px;
-}
-.soa-head { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); margin: 14px 0 10px; }
-
-/* ── RESULT BOX ──────────────────────────────────────── */
-.result-box {
-  background: var(--bg-raised); border: 1px solid var(--border-hi);
-  border-radius: 8px; padding: 14px; margin-top: 12px;
-}
-.result-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); margin-bottom: 6px; }
-.result-val { font-family: var(--font-mono); font-size: 22px; color: var(--cyan); }
+/* ── MISC ── */
+.err-banner { padding: 9px 12px; background: rgba(255,63,74,.07); border: 1px solid rgba(255,63,74,.2); border-radius: 5px; color: #ff7070; font-size: 12px; margin-bottom: 12px; }
+.soa-head { font-family: var(--font-ui); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); margin: 14px 0 8px; border-top: 1px solid var(--border-dim); padding-top: 12px; }
+.result-box { background: var(--bg-raised); border: 1px solid var(--border-hi); border-radius: 6px; padding: 12px; margin-top: 10px; }
+.result-lbl { font-family: var(--font-ui); font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); margin-bottom: 5px; }
+.result-val { font-family: var(--font-mono); font-size: 20px; color: var(--cyan); }
 </style>
 </head>
 <body>
@@ -415,7 +311,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 <div class="topbar">
   <div class="logo" onclick="nav('dashboard')">
     <div class="logo-mark">IP</div>
-    IPAM<span class="logo-slash">//</span>Control
+    IPAM
   </div>
   <nav class="topbar-nav">
     <button class="nav-btn" data-v="dashboard" onclick="nav('dashboard')">Dashboard</button>
@@ -424,26 +320,26 @@ hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     <button class="nav-btn" data-v="dns"        onclick="nav('dns')">DNS Zones</button>
   </nav>
   <div class="topbar-right">
-    <div class="health-pill" onclick="checkHealth()" title="Click to ping">
-      <div class="health-dot" id="hdot"></div>
-      <span id="htext" style="font-size:10px">—</span>
+    <div class="health-pill" onclick="checkHealth()" title="Ping API">
+      <div class="hdot" id="hdot"></div>
+      <span id="htext">—</span>
     </div>
     <button class="key-btn" id="keybtn" onclick="openCfg()">
       <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 7a2 2 0 0 1 2 2m4 0a6 6 0 0 1-7.743 5.743L11 17H9v2H7v2H4a1 1 0 0 1-1-1v-2.586a1 1 0 0 1 .293-.707l5.964-5.964A6 6 0 1 1 21 9z"/></svg>
-      <span id="keylbl">Set API Key</span>
+      <span id="keylbl">API Key</span>
     </button>
   </div>
 </div>
 
-<!-- Main content area -->
+<!-- Main content -->
 <main class="main" id="app">
   <div class="loading"><div class="spinner"></div></div>
 </main>
 
 <!-- Config modal -->
-<div class="cfg-wrap" id="cfgwrap">
-  <div class="cfg-box">
-    <div class="cfg-title">Connection Settings</div>
+<div class="modal-wrap" id="cfgwrap">
+  <div class="modal-box">
+    <div class="modal-title">Connection Settings</div>
     <div class="fg">
       <label class="flbl">API Base URL</label>
       <input class="finp fm" id="cfg-base" placeholder="http://localhost:8000">
@@ -461,39 +357,51 @@ hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
   </div>
 </div>
 
+<!-- Confirm modal -->
+<div class="modal-wrap" id="confirmwrap">
+  <div class="modal-box confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠</div>
+    <div class="confirm-title" id="confirm-title">Confirm</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn" id="confirm-ok" onclick="execConfirm()">Confirm</button>
+      <button class="btn btn-s" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Drawer -->
 <div class="overlay" id="doverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-hd">
     <div class="drawer-title" id="dtitle">—</div>
     <button class="btn btn-icon" onclick="closeDrawer()">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </button>
   </div>
   <div class="drawer-body" id="dbody"></div>
   <div class="drawer-foot" id="dfoot"></div>
 </div>
 
-<!-- Toasts -->
 <div id="toasts"></div>
 
 <script>
 'use strict';
 
-// ─── STATE ───────────────────────────────────────────────────────
+// ─── STATE ────────────────────────────────────────────────────────
 const S = {
   key:  localStorage.getItem('ipam_key')  || '',
   base: localStorage.getItem('ipam_base') || 'http://localhost:8000',
   view: 'dashboard',
   vp:   {},
-  subnets:  null,
-  ips:      null,
-  zones:    null,
-  dSubnet:  null,
-  dIPs:     null,
+  subnets: null,
+  ips:     null,
+  zones:   null,
+  dSubnet: null,
+  dIPs:    null,
 };
 
-// ─── API ─────────────────────────────────────────────────────────
+// ─── API ──────────────────────────────────────────────────────────
 async function api(method, path, body = null) {
   const url = S.base.replace(/\/$/, '') + path;
   const headers = { 'Content-Type': 'application/json' };
@@ -516,33 +424,30 @@ async function api(method, path, body = null) {
 async function checkHealth() {
   try {
     await api('GET', '/health');
-    S.health = 'ok';
-    document.getElementById('hdot').className = 'health-dot ok';
+    document.getElementById('hdot').className = 'hdot ok';
     document.getElementById('htext').textContent = 'online';
     return true;
   } catch {
-    S.health = 'err';
-    document.getElementById('hdot').className = 'health-dot err';
+    document.getElementById('hdot').className = 'hdot err';
     document.getElementById('htext').textContent = 'offline';
     return false;
   }
 }
 
-// ─── NAVIGATION ──────────────────────────────────────────────────
+// ─── NAVIGATION ───────────────────────────────────────────────────
 function nav(view, params = {}) {
   S.view = view; S.vp = params;
   document.querySelectorAll('.nav-btn').forEach(el => {
-    const v = el.dataset.v;
     el.classList.toggle('active',
-      v === view || (view === 'subnet-detail' && v === 'subnets'));
+      el.dataset.v === view || (view === 'subnet-detail' && el.dataset.v === 'subnets'));
   });
   render();
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────────
+// ─── HELPERS ──────────────────────────────────────────────────────
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-
 function set(html) { document.getElementById('app').innerHTML = html; }
+function spinnerPage() { set('<div class="loading"><div class="spinner"></div></div>'); }
 
 function uColor(pct) {
   if (pct >= .95) return 'var(--red)';
@@ -554,9 +459,29 @@ function uBar(s, h = 3) {
   const p = Math.min(100, Math.round(uPct(s) * 100));
   return `<div class="ubar" style="height:${h}px"><div class="ubar-fill" style="width:${p}%;background:${uColor(uPct(s))}"></div></div>`;
 }
-function badge(txt, type='blue') { return `<span class="badge badge-${type}">${txt}</span>`; }
+function badge(txt, type = 'blue') { return `<span class="badge badge-${type}">${txt}</span>`; }
 
-function spinnerPage() { set('<div class="loading"><div class="spinner"></div></div>'); }
+// ─── CONFIRM MODAL ────────────────────────────────────────────────
+let _confirmCb = null;
+function openConfirm(title, msg, callback, btnLabel = 'Delete', btnClass = 'btn-d') {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').innerHTML = msg;
+  const ok = document.getElementById('confirm-ok');
+  ok.textContent = btnLabel;
+  ok.className = 'btn ' + btnClass;
+  ok.style.display = callback ? '' : 'none';
+  _confirmCb = callback;
+  document.getElementById('confirmwrap').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirmwrap').classList.remove('open');
+  _confirmCb = null;
+}
+function execConfirm() {
+  const cb = _confirmCb;
+  closeConfirm();
+  if (cb) cb();
+}
 
 // ─── CONFIG ───────────────────────────────────────────────────────
 function openCfg() {
@@ -575,8 +500,8 @@ function saveCfg() {
 function updateKeyBtn() {
   const btn = document.getElementById('keybtn');
   const lbl = document.getElementById('keylbl');
-  if (S.key) { btn.classList.add('has-key'); lbl.textContent = S.key.slice(0,10) + '…'; }
-  else        { btn.classList.remove('has-key'); lbl.textContent = 'Set API Key'; }
+  if (S.key) { btn.classList.add('has-key'); lbl.textContent = S.key.slice(0, 10) + '…'; }
+  else        { btn.classList.remove('has-key'); lbl.textContent = 'API Key'; }
 }
 
 // ─── DRAWER ───────────────────────────────────────────────────────
@@ -638,27 +563,26 @@ async function renderDash() {
       api('GET', '/dns-zones/?limit=500'),
     ]);
     S.subnets = subnets; S.ips = ips; S.zones = zones;
-
     const totalUsable = subnets.reduce((a, s) => a + s.usable_hosts, 0);
     const utilPct = totalUsable > 0 ? Math.round(ips.length / totalUsable * 100) : 0;
-    const ipv6n = subnets.filter(s => s.is_ipv6).length;
-    const dnsIPs = ips.filter(i => i.dns_name).length;
+    const ipv6n   = subnets.filter(s => s.is_ipv6).length;
+    const dnsIPs  = ips.filter(i => i.dns_name).length;
 
     const subnetRows = subnets.slice(0, 6).map(s => `
       <tr onclick="nav('subnet-detail',{id:${s.id}})">
         <td class="mono">${esc(s.cidr)}</td>
         <td>${esc(s.name)}</td>
-        <td style="min-width:100px">${uBar(s)}</td>
+        <td style="min-width:90px">${uBar(s)}</td>
         <td class="mono-sm">${s.allocated_count}</td>
         <td class="mono-sm">${s.free_count}</td>
-        <td>${badge(s.is_ipv6?'IPv6':'IPv4', s.is_ipv6?'cyan':'blue')}</td>
+        <td>${badge(s.is_ipv6 ? 'IPv6' : 'IPv4', s.is_ipv6 ? 'cyan' : 'blue')}</td>
       </tr>`).join('');
 
     set(`
       <div class="page-hd">
         <div>
           <div class="page-title">Network Overview</div>
-          <div class="page-sub">IPAM system — ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+          <div class="page-sub">${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
         </div>
       </div>
       <div class="stats-row">
@@ -701,9 +625,9 @@ async function renderDash() {
         <button class="btn btn-p" style="margin-top:10px" onclick="nav('subnets')">Create Subnet</button>
       </div></div>`}
     `);
-    countTo('sv-sub', subnets.length);
-    countTo('sv-ip',  ips.length);
-    countTo('sv-dns', zones.length);
+    countTo('sv-sub',  subnets.length);
+    countTo('sv-ip',   ips.length);
+    countTo('sv-dns',  zones.length);
     countTo('sv-util', utilPct, '%');
   } catch (e) {
     set(`<div class="err-banner">${esc(e.message)}</div>`);
@@ -725,16 +649,16 @@ async function renderSubnets() {
           <div class="page-sub">${subnets.length} subnet${subnets.length !== 1 ? 's' : ''}</div>
         </div>
         <button class="btn btn-p" onclick="openCreateSubnet()">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
           New Subnet
         </button>
       </div>
       ${subnets.length === 0
         ? `<div class="card"><div class="empty">
-            <div class="empty-ico">⬡</div>
-            <div class="empty-txt">No subnets configured</div>
-            <div class="empty-hint">Add your first subnet to start tracking IP space</div>
-            <button class="btn btn-p" style="margin-top:10px" onclick="openCreateSubnet()">Create First Subnet</button>
+             <div class="empty-ico">⬡</div>
+             <div class="empty-txt">No subnets configured</div>
+             <div class="empty-hint">Add your first subnet to start tracking IP space</div>
+             <button class="btn btn-p" style="margin-top:10px" onclick="openCreateSubnet()">Create First Subnet</button>
            </div></div>`
         : `<div class="sc-grid">${subnets.map(scCard).join('')}</div>`
       }
@@ -745,19 +669,27 @@ async function renderSubnets() {
 function scCard(s) {
   const p = Math.min(100, Math.round(uPct(s) * 100));
   const c = uColor(uPct(s));
-  const utilBadge = p >= 95 ? badge('FULL','red') : p >= 75 ? badge('HIGH','amber') : '';
+  const utilBadge = p >= 95 ? badge('FULL', 'red') : p >= 75 ? badge('HIGH', 'amber') : '';
   return `
   <div class="sc" onclick="nav('subnet-detail',{id:${s.id}})">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
-      <div class="sc-cidr">${esc(s.cidr)}</div>
-      <div style="display:flex;gap:4px">${utilBadge} ${badge(s.is_ipv6?'IPv6':'IPv4',s.is_ipv6?'cyan':'blue')}</div>
+    <div class="sc-actions">
+      <button class="btn btn-icon btn-sm" title="Edit subnet"
+        onclick="event.stopPropagation();openEditSubnet(${s.id})">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="btn btn-icon btn-sm del" title="Delete subnet"
+        onclick="event.stopPropagation();delSubnet(${s.id},'${esc(s.cidr)}',${s.allocated_count})">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+      </button>
     </div>
+    <div class="sc-cidr">${esc(s.cidr)}</div>
     <div class="sc-name">${esc(s.name)}${s.description ? ' — ' + esc(s.description) : ''}</div>
+    <div class="sc-badges">${utilBadge} ${badge(s.is_ipv6 ? 'IPv6' : 'IPv4', s.is_ipv6 ? 'cyan' : 'blue')}</div>
     <div class="sc-ubar"><div class="sc-fill" style="width:${p}%;background:${c}"></div></div>
     <div class="sc-stats">
-      <div><strong>${s.allocated_count}</strong> allocated</div>
-      <div><strong>${s.free_count}</strong> free</div>
-      <div><strong>${p}%</strong> used</div>
+      <span><strong>${s.allocated_count}</strong> alloc</span>
+      <span><strong>${s.free_count}</strong> free</span>
+      <span><strong>${p}%</strong> used</span>
     </div>
   </div>`;
 }
@@ -774,8 +706,8 @@ async function renderSubnetDetail() {
       api('GET', `/ip-addresses/?subnet_id=${id}&limit=1000`),
     ]);
     S.dSubnet = subnet; S.dIPs = ips;
-    const p = uPct(subnet);
-    const c = uColor(p);
+    const p    = uPct(subnet);
+    const c    = uColor(p);
     const pPct = Math.min(100, Math.round(p * 100));
     const showGrid = !subnet.is_ipv6 && subnet.total_hosts <= 4096;
 
@@ -788,7 +720,7 @@ async function renderSubnetDetail() {
           <button class="btn btn-icon btn-sm" title="Edit" onclick="openEditIP(${ip.id})">
             <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn btn-icon btn-sm" title="Delete" style="color:#f07070;margin-left:4px" onclick="delIP(${ip.id},'${esc(ip.address)}')">
+          <button class="btn btn-icon btn-sm del" title="Delete" style="margin-left:3px" onclick="delIP(${ip.id},'${esc(ip.address)}')">
             <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
           </button>
         </td>
@@ -796,7 +728,7 @@ async function renderSubnetDetail() {
 
     set(`
       <button class="back" onclick="nav('subnets')">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
         Back to Subnets
       </button>
       <div class="page-hd">
@@ -804,12 +736,20 @@ async function renderSubnetDetail() {
           <div class="page-title" style="font-family:var(--font-mono);font-size:22px">${esc(subnet.cidr)}</div>
           <div class="page-sub">${esc(subnet.name)}${subnet.description ? ' — ' + esc(subnet.description) : ''}</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
           <button class="btn btn-p btn-sm" onclick="openAllocate(${subnet.id})">
             <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
             Allocate Next IP
           </button>
           <button class="btn btn-s btn-sm" onclick="openAddIP(${subnet.id})">Add Specific IP</button>
+          <button class="btn btn-s btn-sm" onclick="openEditSubnet(${subnet.id})" title="Edit subnet">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
+          <button class="btn btn-d btn-sm" onclick="delSubnet(${subnet.id},'${esc(subnet.cidr)}',${subnet.allocated_count})" title="Delete subnet">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+            Delete
+          </button>
         </div>
       </div>
 
@@ -828,13 +768,11 @@ async function renderSubnetDetail() {
               : `<table class="dtbl">
                    <thead><tr><th>Address</th><th>DNS Name</th><th>Description</th><th style="text-align:right">Actions</th></tr></thead>
                    <tbody>${ipRows}</tbody>
-                 </table>`
-            }
+                 </table>`}
           </div>
         </div>
 
         <div>
-          <!-- Stats panel -->
           <div class="card" style="margin-bottom:14px">
             <div class="card-hd"><div class="card-title">Subnet Details</div></div>
             <div style="padding:14px 16px">
@@ -847,20 +785,19 @@ async function renderSubnetDetail() {
               </div>
               <table class="detail-tbl">
                 ${[
-                  ['Netmask',   subnet.netmask],
-                  ['Broadcast', subnet.broadcast],
-                  ['1st Usable',subnet.first_usable],
+                  ['Netmask',    subnet.netmask],
+                  ['Broadcast',  subnet.broadcast],
+                  ['1st Usable', subnet.first_usable],
                   ['Last Usable',subnet.last_usable],
-                  ['Total',     subnet.total_hosts.toLocaleString()],
-                  ['Usable',    subnet.usable_hosts.toLocaleString()],
-                  ['Free',      subnet.free_count.toLocaleString()],
-                  ['Type',      subnet.is_ipv6 ? 'IPv6' : 'IPv4'],
-                ].map(([k,v])=>`<tr><td>${k}</td><td>${esc(String(v))}</td></tr>`).join('')}
+                  ['Total',      subnet.total_hosts.toLocaleString()],
+                  ['Usable',     subnet.usable_hosts.toLocaleString()],
+                  ['Free',       subnet.free_count.toLocaleString()],
+                  ['Type',       subnet.is_ipv6 ? 'IPv6' : 'IPv4'],
+                ].map(([k,v]) => `<tr><td>${k}</td><td>${esc(String(v))}</td></tr>`).join('')}
               </table>
             </div>
           </div>
 
-          <!-- IP Grid -->
           ${showGrid ? `
           <div class="card">
             <div class="card-hd">
@@ -869,15 +806,9 @@ async function renderSubnetDetail() {
             </div>
             <div class="ipgrid-wrap">
               <div class="ipgrid-legend">
-                <div class="ipgrid-legend-item">
-                  <div class="ipgrid-legend-swatch" style="background:var(--bg-raised);border:1px solid var(--border)"></div>Free
-                </div>
-                <div class="ipgrid-legend-item">
-                  <div class="ipgrid-legend-swatch" style="background:var(--cyan);box-shadow:0 0 4px var(--cyan-glow)"></div>Allocated
-                </div>
-                <div class="ipgrid-legend-item">
-                  <div class="ipgrid-legend-swatch" style="background:var(--border-hi)"></div>Reserved
-                </div>
+                <div class="ipgrid-legend-item"><div class="ipgrid-legend-swatch" style="background:var(--bg-raised);border:1px solid var(--border)"></div>Free</div>
+                <div class="ipgrid-legend-item"><div class="ipgrid-legend-swatch" style="background:var(--cyan);box-shadow:0 0 3px var(--cyan-glow)"></div>Alloc</div>
+                <div class="ipgrid-legend-item"><div class="ipgrid-legend-swatch" style="background:var(--border-hi)"></div>Reserved</div>
               </div>
               <div id="ip-grid"></div>
             </div>
@@ -885,54 +816,44 @@ async function renderSubnetDetail() {
         </div>
       </div>
     `);
-
     if (showGrid) buildGrid(subnet, ips);
   } catch (e) { set(`<div class="err-banner">${esc(e.message)}</div>`); }
 }
 
 // ─── IP GRID BUILDER ──────────────────────────────────────────────
-function ip4ToInt(ip) { return ip.split('.').reduce((a,o) => (a<<8)+parseInt(o), 0) >>> 0; }
-function intToIP4(n) { return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.'); }
-function intToHex32(n) { return '0'.repeat(24) + ((n>>>0).toString(16).padStart(8,'0')); }
+function ip4ToInt(ip) { return ip.split('.').reduce((a, o) => (a << 8) + parseInt(o), 0) >>> 0; }
+function intToIP4(n)  { return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.'); }
+function intToHex32(n){ return '0'.repeat(24) + ((n >>> 0).toString(16).padStart(8, '0')); }
 
 function buildGrid(subnet, ips) {
   const el = document.getElementById('ip-grid');
   if (!el) return;
-
   const allocMap = new Map(ips.map(ip => [ip.address, ip]));
   const [addrPart, prefixStr] = subnet.cidr.split('/');
   const prefix = parseInt(prefixStr);
-  const base = ip4ToInt(addrPart);
-  const total = subnet.total_hosts;
-
-  const cols = total <= 16 ? 4 : total <= 64 ? 8 : total <= 256 ? 16 : total <= 1024 ? 32 : 64;
-  const sz   = total <= 256 ? 12 : total <= 1024 ? 7 : 4;
-  const gap  = sz >= 7 ? 2 : 1;
-
+  const base   = ip4ToInt(addrPart);
+  const total  = subnet.total_hosts;
+  const cols   = total <= 16 ? 4 : total <= 64 ? 8 : total <= 256 ? 16 : total <= 1024 ? 32 : 64;
+  const sz     = total <= 256 ? 12 : total <= 1024 ? 7 : 4;
+  const gap    = sz >= 7 ? 2 : 1;
   el.style.gridTemplateColumns = `repeat(${cols}, ${sz}px)`;
   el.style.gap = `${gap}px`;
-
   const frag = document.createDocumentFragment();
   for (let i = 0; i < total; i++) {
     const ipInt = base + i;
     const hex   = intToHex32(ipInt);
     const cell  = document.createElement('div');
     cell.className = 'ipc';
-    cell.style.width  = sz + 'px';
-    cell.style.height = sz + 'px';
-
+    cell.style.width = cell.style.height = sz + 'px';
     const isNet  = i === 0;
     const isBrdc = i === total - 1 && prefix < 31;
-
     if (isNet || isBrdc) {
       cell.classList.add('res');
       cell.title = intToIP4(ipInt) + (isNet ? ' (network)' : ' (broadcast)');
     } else if (allocMap.has(hex)) {
       const ipd = allocMap.get(hex);
       cell.classList.add('alloc');
-      cell.title = ipd.address
-        + (ipd.dns_name    ? '\n' + ipd.dns_name    : '')
-        + (ipd.description ? '\n' + ipd.description : '');
+      cell.title = ipd.address + (ipd.dns_name ? '\n' + ipd.dns_name : '') + (ipd.description ? '\n' + ipd.description : '');
     } else {
       cell.classList.add('free');
       cell.title = intToIP4(ipInt);
@@ -956,13 +877,11 @@ async function renderIPs() {
     const smap = new Map(subs.map(s => [s.id, s]));
     window._allIPs = ips; window._smap = smap;
 
-    const rows = ips.map(ip => ipRow(ip, smap)).join('');
-
     set(`
       <div class="page-hd">
         <div>
           <div class="page-title">IP Addresses</div>
-          <div class="page-sub">${ips.length} address${ips.length !== 1?'es':''} allocated</div>
+          <div class="page-sub">${ips.length} address${ips.length !== 1 ? 'es' : ''} allocated</div>
         </div>
       </div>
       <div class="filters">
@@ -978,7 +897,7 @@ async function renderIPs() {
         : `<div class="card">
              <table class="dtbl">
                <thead><tr><th>Address</th><th>Subnet</th><th>DNS Name</th><th>Description</th><th>Type</th><th style="text-align:right">Actions</th></tr></thead>
-               <tbody id="iptbody">${rows}</tbody>
+               <tbody id="iptbody">${ips.map(ip => ipRow(ip, smap)).join('')}</tbody>
              </table>
            </div>`
       }
@@ -988,17 +907,17 @@ async function renderIPs() {
 
 function ipRow(ip, smap) {
   const sub = smap?.get(ip.subnet_id);
-  return `<tr data-addr="${esc(ip.address)}" data-dns="${esc(ip.dns_name||'')}">
+  return `<tr data-addr="${esc(ip.address)}" data-dns="${esc(ip.dns_name || '')}">
     <td class="mono">${esc(ip.address)}</td>
-    <td class="mono-sm">${sub ? esc(sub.cidr) : '#'+ip.subnet_id}</td>
+    <td class="mono-sm">${sub ? esc(sub.cidr) : '#' + ip.subnet_id}</td>
     <td class="mono-sm">${ip.dns_name ? esc(ip.dns_name) : '<span style="color:var(--text-3)">—</span>'}</td>
     <td style="color:var(--text-2);font-size:12px">${ip.description ? esc(ip.description) : '<span style="color:var(--text-3)">—</span>'}</td>
-    <td>${badge(ip.is_ipv6?'IPv6':'IPv4',ip.is_ipv6?'cyan':'blue')}</td>
+    <td>${badge(ip.is_ipv6 ? 'IPv6' : 'IPv4', ip.is_ipv6 ? 'cyan' : 'blue')}</td>
     <td style="text-align:right;white-space:nowrap">
       <button class="btn btn-icon btn-sm" title="Edit" onclick="openEditIP(${ip.id})">
         <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
-      <button class="btn btn-icon btn-sm" title="Delete" style="color:#f07070;margin-left:4px" onclick="delIP(${ip.id},'${esc(ip.address)}')">
+      <button class="btn btn-icon btn-sm del" title="Delete" style="margin-left:3px" onclick="delIP(${ip.id},'${esc(ip.address)}')">
         <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
       </button>
     </td>
@@ -1009,8 +928,8 @@ function filterIPs() {
   const fa = (document.getElementById('fa')?.value || '').toLowerCase();
   const fd = (document.getElementById('fd')?.value || '').toLowerCase();
   document.querySelectorAll('#iptbody tr').forEach(r => {
-    const show = (!fa || (r.dataset.addr||'').includes(fa))
-              && (!fd || (r.dataset.dns||'').includes(fd));
+    const show = (!fa || (r.dataset.addr || '').includes(fa))
+              && (!fd || (r.dataset.dns  || '').includes(fd));
     r.style.display = show ? '' : 'none';
   });
 }
@@ -1027,10 +946,10 @@ async function renderDNS() {
       <div class="page-hd">
         <div>
           <div class="page-title">DNS Zones</div>
-          <div class="page-sub">${zones.length} zone${zones.length!==1?'s':''}</div>
+          <div class="page-sub">${zones.length} zone${zones.length !== 1 ? 's' : ''}</div>
         </div>
         <button class="btn btn-p" onclick="openCreateDNS()">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
           New Zone
         </button>
       </div>
@@ -1055,11 +974,11 @@ function zCard(z) {
         <div class="zc-name">${esc(z.name)}</div>
         ${z.description ? `<div class="zc-desc">${esc(z.description)}</div>` : ''}
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
+      <div style="display:flex;gap:5px;flex-shrink:0">
         <button class="btn btn-icon btn-sm" title="Edit" onclick="openEditDNS(${z.id})">
           <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
-        <button class="btn btn-icon btn-sm" title="Delete" style="color:#f07070" onclick="delDNS(${z.id},'${esc(z.name)}')">
+        <button class="btn btn-icon btn-sm del" title="Delete" onclick="delDNS(${z.id},'${esc(z.name)}')">
           <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
         </button>
       </div>
@@ -1077,10 +996,9 @@ function zCard(z) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// CREATE / EDIT FORMS
+// SUBNET CRUD FORMS
 // ─────────────────────────────────────────────────────────────────
 
-// ── CREATE SUBNET ────────────────────────────────────────────────
 function openCreateSubnet() {
   openDrawer('New Subnet', `
     <div class="fg">
@@ -1117,11 +1035,75 @@ async function submitCreateSubnet() {
   } catch (e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
-// ── ALLOCATE NEXT IP ─────────────────────────────────────────────
+function openEditSubnet(id) {
+  const s = (S.subnets || []).find(s => s.id === id) || S.dSubnet;
+  openDrawer('Edit Subnet', `
+    <div style="font-family:var(--font-mono);font-size:17px;color:var(--text);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">${s ? esc(s.cidr) : '#' + id}</div>
+    <div class="fg">
+      <label class="flbl">Name *</label>
+      <input class="finp" id="f-name" value="${esc(s?.name || '')}" placeholder="Subnet name">
+    </div>
+    <div class="fg">
+      <label class="flbl">Description</label>
+      <input class="finp" id="f-desc" value="${esc(s?.description || '')}" placeholder="Optional description">
+      <div class="fhint">Leave blank to clear</div>
+    </div>
+    <div id="ferr" class="err-banner" style="display:none"></div>
+  `, `
+    <button class="btn btn-p" style="flex:1" onclick="submitEditSubnet(${id})">Save Changes</button>
+    <button class="btn btn-s" onclick="closeDrawer()">Cancel</button>
+  `);
+}
+
+async function submitEditSubnet(id) {
+  const name = document.getElementById('f-name').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+  const err  = document.getElementById('ferr');
+  err.style.display = 'none';
+  if (!name) { err.textContent = 'Name is required'; err.style.display = 'block'; return; }
+  try {
+    await api('PUT', `/subnets/${id}`, { name, description: desc || null });
+    closeDrawer(); toast('Subnet updated', 'ok'); S.subnets = null;
+    if (S.view === 'subnet-detail') await renderSubnetDetail();
+    else await renderSubnets();
+  } catch (e) { err.textContent = e.message; err.style.display = 'block'; }
+}
+
+function delSubnet(id, cidr, allocCount) {
+  if (allocCount > 0) {
+    openConfirm(
+      'Cannot Delete Subnet',
+      `<strong style="font-family:var(--font-mono)">${esc(cidr)}</strong> contains <strong>${allocCount}</strong> allocated IP address${allocCount !== 1 ? 'es' : ''}.<br><br>Release all addresses before deleting this subnet.`,
+      null,
+      'OK',
+      'btn-s'
+    );
+    return;
+  }
+  openConfirm(
+    'Delete Subnet',
+    `Permanently delete subnet <strong style="font-family:var(--font-mono)">${esc(cidr)}</strong>?<br>This action cannot be undone.`,
+    async () => {
+      try {
+        await api('DELETE', `/subnets/${id}`);
+        toast(`${cidr} deleted`, 'ok'); S.subnets = null;
+        if (S.view === 'subnet-detail') nav('subnets');
+        else await renderSubnets();
+      } catch (e) { toast(e.message, 'err'); }
+    },
+    'Delete',
+    'btn-d'
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// ALLOCATE / ADD IP FORMS
+// ─────────────────────────────────────────────────────────────────
+
 function openAllocate(subnetId) {
   openDrawer('Allocate Next IP', `
-    <p style="font-size:13px;color:var(--text-2);margin-bottom:18px">
-      Assigns the lowest available address in subnet <strong style="font-family:var(--font-mono)">${esc(S.dSubnet?.cidr||'')}</strong>.
+    <p style="font-size:12px;color:var(--text-2);margin-bottom:16px">
+      Assigns the lowest available address in <strong style="font-family:var(--font-mono)">${esc(S.dSubnet?.cidr || '')}</strong>.
     </p>
     <div class="fg">
       <label class="flbl">DNS Name (optional)</label>
@@ -1149,7 +1131,7 @@ async function submitAllocate(subnetId) {
   const err  = document.getElementById('ferr');
   err.style.display = 'none';
   try {
-    const r = await api('POST', `/subnets/${subnetId}/allocate`, { dns_name: dns||null, description: desc||null });
+    const r = await api('POST', `/subnets/${subnetId}/allocate`, { dns_name: dns || null, description: desc || null });
     document.getElementById('fresult').style.display = 'block';
     document.getElementById('fresult-addr').textContent = r.address;
     document.getElementById('fsub').disabled = true;
@@ -1158,7 +1140,6 @@ async function submitAllocate(subnetId) {
   } catch (e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
-// ── ADD SPECIFIC IP ──────────────────────────────────────────────
 function openAddIP(subnetId) {
   openDrawer('Add Specific IP', `
     <div class="fg">
@@ -1188,28 +1169,28 @@ async function submitAddIP(subnetId) {
   err.style.display = 'none';
   if (!address) { err.textContent = 'IP address is required'; err.style.display = 'block'; return; }
   try {
-    await api('POST', '/ip-addresses/', { address, subnet_id: subnetId, dns_name: dns||null, description: desc||null });
+    await api('POST', '/ip-addresses/', { address, subnet_id: subnetId, dns_name: dns || null, description: desc || null });
     closeDrawer(); toast('IP address added', 'ok'); await renderSubnetDetail();
   } catch (e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
-// ── EDIT IP ──────────────────────────────────────────────────────
-async function openEditIP(ipId) {
-  // Find from cached state
-  let ip = (S.dIPs || []).find(i => i.id === ipId)
-        || (S.ips  || []).find(i => i.id === ipId);
-  if (!ip) { try { ip = await api('GET', `/ip-addresses/${ipId}`); } catch(e) { toast(e.message,'err'); return; } }
+// ─────────────────────────────────────────────────────────────────
+// EDIT / DELETE IP
+// ─────────────────────────────────────────────────────────────────
 
+async function openEditIP(ipId) {
+  let ip = (S.dIPs || []).find(i => i.id === ipId) || (S.ips || []).find(i => i.id === ipId);
+  if (!ip) { try { ip = await api('GET', `/ip-addresses/${ipId}`); } catch(e) { toast(e.message, 'err'); return; } }
   openDrawer(`Edit ${ip.address}`, `
-    <div style="font-family:var(--font-mono);font-size:20px;color:var(--text);margin-bottom:18px">${esc(ip.address)}</div>
+    <div style="font-family:var(--font-mono);font-size:17px;color:var(--text);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">${esc(ip.address)}</div>
     <div class="fg">
       <label class="flbl">DNS Name</label>
-      <input class="finp fm" id="f-dns" value="${esc(ip.dns_name||'')}" placeholder="host.example.com">
+      <input class="finp fm" id="f-dns" value="${esc(ip.dns_name || '')}" placeholder="host.example.com">
       <div class="fhint">Clear to remove DNS association</div>
     </div>
     <div class="fg">
       <label class="flbl">Description</label>
-      <input class="finp" id="f-desc" value="${esc(ip.description||'')}" placeholder="">
+      <input class="finp" id="f-desc" value="${esc(ip.description || '')}" placeholder="">
     </div>
     <div id="ferr" class="err-banner" style="display:none"></div>
   `, `
@@ -1224,69 +1205,78 @@ async function submitEditIP(ipId) {
   const err  = document.getElementById('ferr');
   err.style.display = 'none';
   try {
-    await api('PUT', `/ip-addresses/${ipId}`, { dns_name: dns||null, description: desc||null });
+    await api('PUT', `/ip-addresses/${ipId}`, { dns_name: dns || null, description: desc || null });
     closeDrawer(); toast('Updated', 'ok');
     if (S.view === 'subnet-detail') await renderSubnetDetail(); else await renderIPs();
   } catch (e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
-// ── DELETE IP ────────────────────────────────────────────────────
 async function delIP(ipId, address) {
-  if (!confirm(`Delete ${address}?\nThis frees the address for future allocation.`)) return;
-  try {
-    await api('DELETE', `/ip-addresses/${ipId}`);
-    toast(address + ' released', 'ok');
-    if (S.view === 'subnet-detail') await renderSubnetDetail(); else await renderIPs();
-  } catch (e) { toast(e.message, 'err'); }
+  openConfirm(
+    'Release IP Address',
+    `Release <strong style="font-family:var(--font-mono)">${esc(address)}</strong>?<br>This frees the address for future allocation.`,
+    async () => {
+      try {
+        await api('DELETE', `/ip-addresses/${ipId}`);
+        toast(address + ' released', 'ok');
+        if (S.view === 'subnet-detail') await renderSubnetDetail(); else await renderIPs();
+      } catch (e) { toast(e.message, 'err'); }
+    },
+    'Release',
+    'btn-d'
+  );
 }
 
-// ── DNS ZONE FORM ────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// DNS ZONE FORMS
+// ─────────────────────────────────────────────────────────────────
+
 function dnsForm(z = null) {
   const s = z?.soa || {};
   return `
     <div class="fg">
       <label class="flbl">Zone Name *</label>
-      <input class="finp fm" id="f-zname" value="${esc(z?.name||'')}" placeholder="example.com">
+      <input class="finp fm" id="f-zname" value="${esc(z?.name || '')}" placeholder="example.com">
     </div>
     <div class="fg">
       <label class="flbl">Description</label>
-      <input class="finp" id="f-zdesc" value="${esc(z?.description||'')}" placeholder="">
+      <input class="finp" id="f-zdesc" value="${esc(z?.description || '')}" placeholder="">
     </div>
     <div class="soa-head">SOA Record</div>
     <div class="grid2">
       <div class="fg">
         <label class="flbl">MNAME *</label>
-        <input class="finp fm" id="f-mname" value="${esc(s.mname||'')}" placeholder="ns1.example.com">
+        <input class="finp fm" id="f-mname" value="${esc(s.mname || '')}" placeholder="ns1.example.com">
         <div class="fhint">Primary nameserver</div>
       </div>
       <div class="fg">
         <label class="flbl">RNAME *</label>
-        <input class="finp fm" id="f-rname" value="${esc(s.rname||'')}" placeholder="hostmaster.example.com">
+        <input class="finp fm" id="f-rname" value="${esc(s.rname || '')}" placeholder="hostmaster.example.com">
         <div class="fhint">Responsible party</div>
       </div>
     </div>
     <div class="grid3">
       <div class="fg">
         <label class="flbl">Serial</label>
-        <input class="finp fm" id="f-serial" type="number" value="${s.serial??1}">
+        <input class="finp fm" id="f-serial"  type="number" value="${s.serial  ?? 1}">
       </div>
       <div class="fg">
         <label class="flbl">Refresh (s)</label>
-        <input class="finp fm" id="f-refresh" type="number" value="${s.refresh??3600}">
+        <input class="finp fm" id="f-refresh" type="number" value="${s.refresh ?? 3600}">
       </div>
       <div class="fg">
         <label class="flbl">Retry (s)</label>
-        <input class="finp fm" id="f-retry" type="number" value="${s.retry??600}">
+        <input class="finp fm" id="f-retry"   type="number" value="${s.retry   ?? 600}">
       </div>
     </div>
     <div class="grid2">
       <div class="fg">
         <label class="flbl">Expire (s)</label>
-        <input class="finp fm" id="f-expire" type="number" value="${s.expire??604800}">
+        <input class="finp fm" id="f-expire"  type="number" value="${s.expire  ?? 604800}">
       </div>
       <div class="fg">
         <label class="flbl">Minimum (s)</label>
-        <input class="finp fm" id="f-minimum" type="number" value="${s.minimum??86400}">
+        <input class="finp fm" id="f-minimum" type="number" value="${s.minimum ?? 86400}">
       </div>
     </div>
     <div id="ferr" class="err-banner" style="display:none"></div>
@@ -1305,7 +1295,7 @@ function getDNSData() {
       retry:   parseInt(document.getElementById('f-retry').value)   || 600,
       expire:  parseInt(document.getElementById('f-expire').value)  || 604800,
       minimum: parseInt(document.getElementById('f-minimum').value) || 86400,
-    }
+    },
   };
 }
 
@@ -1317,29 +1307,36 @@ function openCreateDNS() {
 }
 async function submitCreateDNS() {
   const d = getDNSData(); const err = document.getElementById('ferr'); err.style.display = 'none';
-  if (!d.name||!d.soa.mname||!d.soa.rname) { err.textContent='Name, MNAME and RNAME are required'; err.style.display='block'; return; }
-  try { await api('POST','/dns-zones/',d); closeDrawer(); toast('Zone created','ok'); await renderDNS(); }
-  catch(e) { err.textContent=e.message; err.style.display='block'; }
+  if (!d.name || !d.soa.mname || !d.soa.rname) { err.textContent = 'Name, MNAME and RNAME are required'; err.style.display = 'block'; return; }
+  try { await api('POST', '/dns-zones/', d); closeDrawer(); toast('Zone created', 'ok'); await renderDNS(); }
+  catch (e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
 async function openEditDNS(zoneId) {
-  let z = (S.zones||[]).find(z=>z.id===zoneId);
-  if (!z) { try { z = await api('GET',`/dns-zones/${zoneId}`); } catch(e) { toast(e.message,'err'); return; } }
+  let z = (S.zones || []).find(z => z.id === zoneId);
+  if (!z) { try { z = await api('GET', `/dns-zones/${zoneId}`); } catch(e) { toast(e.message, 'err'); return; } }
   openDrawer(`Edit ${z.name}`, dnsForm(z), `
     <button class="btn btn-p" style="flex:1" onclick="submitEditDNS(${z.id})">Save Changes</button>
     <button class="btn btn-s" onclick="closeDrawer()">Cancel</button>
   `);
 }
 async function submitEditDNS(zoneId) {
-  const d=getDNSData(); const err=document.getElementById('ferr'); err.style.display='none';
-  try { await api('PUT',`/dns-zones/${zoneId}`,d); closeDrawer(); toast('Zone updated','ok'); await renderDNS(); }
-  catch(e) { err.textContent=e.message; err.style.display='block'; }
+  const d = getDNSData(); const err = document.getElementById('ferr'); err.style.display = 'none';
+  try { await api('PUT', `/dns-zones/${zoneId}`, d); closeDrawer(); toast('Zone updated', 'ok'); await renderDNS(); }
+  catch (e) { err.textContent = e.message; err.style.display = 'block'; }
 }
 
 async function delDNS(zoneId, name) {
-  if (!confirm(`Delete DNS zone '${name}'?`)) return;
-  try { await api('DELETE',`/dns-zones/${zoneId}`); toast(`'${name}' deleted`,'ok'); await renderDNS(); }
-  catch(e) { toast(e.message,'err'); }
+  openConfirm(
+    'Delete DNS Zone',
+    `Delete zone <strong style="font-family:var(--font-mono)">${esc(name)}</strong>?<br>IP addresses using this zone will not be automatically updated.`,
+    async () => {
+      try { await api('DELETE', `/dns-zones/${zoneId}`); toast(`'${name}' deleted`, 'ok'); await renderDNS(); }
+      catch (e) { toast(e.message, 'err'); }
+    },
+    'Delete',
+    'btn-d'
+  );
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────

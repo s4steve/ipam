@@ -4,7 +4,7 @@ A FastAPI-based IP Address Management system for tracking subnets and IP address
 
 ## Features
 
-- Create and look up subnets by CIDR notation or friendly name
+- Full CRUD for subnets — create, read, update (name/description), and delete; subnets must be empty before deletion
 - Full CRUD for IP addresses with parent subnet validation
 - Automatic allocation of the next free IP address in a subnet
 - Full CRUD for DNS zones with SOA record management
@@ -89,8 +89,8 @@ On first visit, click **Set API Key** in the top-right corner and enter your API
 The UI provides:
 
 - **Dashboard** — live stats (subnets, allocated IPs, DNS zones, utilization) with a subnet overview table
-- **Subnets** — card grid with colour-coded utilization bars; click any card to drill into the subnet
-- **Subnet detail** — full IP address table with edit/delete, a sidebar with all computed subnet properties, and an address-map grid that renders each IP as a pixel (free = dark, allocated = glowing cyan) for subnets up to /20
+- **Subnets** — card grid with colour-coded utilization bars; hover to reveal per-card edit and delete actions; click any card to drill into the subnet
+- **Subnet detail** — full IP address table with edit/delete, edit and delete actions for the subnet itself, a sidebar with all computed subnet properties, and an address-map grid that renders each IP as a pixel (free = dark, allocated = glowing cyan) for subnets up to /20
 - **IP Addresses** — paginated table of all allocated addresses with live client-side filtering by address or DNS name
 - **DNS Zones** — card view of all zones with full SOA details; create, edit, and delete zones inline
 
@@ -131,6 +131,8 @@ docker run -p 8000:8000 -v ./data:/app/data -e IPAM_API_KEY=<your key> ipam
 | GET    | `/subnets/`                   | List/filter subnets (`cidr`, `name`, `contains`)     |
 | POST   | `/subnets/`                   | Create a new subnet                                  |
 | GET    | `/subnets/{id}`               | Get a single subnet                                  |
+| PUT    | `/subnets/{id}`               | Update a subnet's name and/or description            |
+| DELETE | `/subnets/{id}`               | Delete a subnet (must contain no allocated IPs)      |
 | POST   | `/subnets/{id}/allocate`      | Allocate the next free IP address in a subnet        |
 | GET    | `/ip-addresses/`              | List IP addresses (`subnet_id`, `address`, `dns_name`) |
 | GET    | `/ip-addresses/{id}`          | Get a single IP address                              |
@@ -155,6 +157,26 @@ curl -X POST http://localhost:8000/subnets/ \
   -H "Content-Type: application/json" \
   -d '{"name": "Branch Office", "cidr": "192.168.1.0/24"}'
 ```
+
+### Example: Update a subnet
+
+```bash
+curl -X PUT http://localhost:8000/subnets/1 \
+  -H "Authorization: Bearer $IPAM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Branch Office LAN", "description": "Renovated 2026"}'
+```
+
+Only provided fields are changed. The CIDR cannot be modified after creation.
+
+### Example: Delete a subnet
+
+```bash
+curl -X DELETE http://localhost:8000/subnets/1 \
+  -H "Authorization: Bearer $IPAM_API_KEY"
+```
+
+Returns `204 No Content` on success. Returns `409 Conflict` if the subnet still contains allocated IP addresses — release them first.
 
 ### Example: Look up a subnet
 
@@ -198,7 +220,7 @@ curl -H "Authorization: Bearer $IPAM_API_KEY" "http://localhost:8000/ip-addresse
 
 ## MCP Server
 
-`mcp_server.py` exposes all 14 API actions as MCP tools so Claude Desktop or any MCP client can manage your IPAM through natural language.
+`mcp_server.py` exposes the IPAM API as MCP tools so Claude Desktop or any MCP client can manage your IPAM through natural language.
 
 ### Tools
 
