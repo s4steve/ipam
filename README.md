@@ -1,6 +1,6 @@
 # IPAM - IP Address Management
 
-A FastAPI-based IP Address Management system for tracking subnets and IP addresses with full IPv4 and IPv6 support. Includes an MCP server so Claude Desktop (or any MCP client) can manage your IPAM directly through natural language.
+A FastAPI-based IP Address Management system for tracking subnets and IP addresses with full IPv4 and IPv6 support. Includes a web UI, an MCP server so Claude Desktop (or any MCP client) can manage your IPAM directly through natural language.
 
 ## Features
 
@@ -12,6 +12,7 @@ A FastAPI-based IP Address Management system for tracking subnets and IP address
 - Automatic calculation of netmask, broadcast address, usable host range, and host counts
 - Full IPv4 and IPv6 support
 - SQLite storage with hex-encoded addresses for correct sorting across address families
+- Browser-based web UI at `/ui`
 - MCP server for LLM/Claude Desktop integration
 
 ## Requirements
@@ -78,6 +79,20 @@ uvicorn main:app --reload
 ```
 
 The API is available at http://localhost:8000. Interactive docs are at http://localhost:8000/docs.
+
+## Web UI
+
+A browser-based management interface is served at http://localhost:8000/ui.
+
+On first visit, click **Set API Key** in the top-right corner and enter your API base URL and API key. Settings are saved in `localStorage` so you only need to do this once per browser.
+
+The UI provides:
+
+- **Dashboard** — live stats (subnets, allocated IPs, DNS zones, utilization) with a subnet overview table
+- **Subnets** — card grid with colour-coded utilization bars; click any card to drill into the subnet
+- **Subnet detail** — full IP address table with edit/delete, a sidebar with all computed subnet properties, and an address-map grid that renders each IP as a pixel (free = dark, allocated = glowing cyan) for subnets up to /20
+- **IP Addresses** — paginated table of all allocated addresses with live client-side filtering by address or DNS name
+- **DNS Zones** — card view of all zones with full SOA details; create, edit, and delete zones inline
 
 ## Docker
 
